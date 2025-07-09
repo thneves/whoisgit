@@ -2,14 +2,23 @@
 
 require_relative '../backend/lib/git_repo'
 
+def abort_with(msg)
+  puts msg
+  exit 1
+end
+
 command = ARGV[0]
+target = ARGV[1]
 
 case command
 when "init"
   GitRepo.create
 when "hash-object"
-  target_file = ARGV[1]
-  GitRepo.hash_object(target_file)
+  abort_with("Missing target input") if target.nil?
+  GitRepo.hash_object(target)
 else
-  puts "Unkown command: #{command}"
+  msg = "Unkonw command: #{command}"
+  abort_with(msg)
 end
+
+
