@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require_relative '../backend/lib/git_repo'
+
+command = ARGV[0]
+
+case command
+when "init"
+  GitRepo.create
+when "hash-object"
+  target_file = ARGV[1]
+  GitRepo.hash_object(target_file)
+else
+  puts "Unkown command: #{command}"
+end
