@@ -1,10 +1,12 @@
 #!/usr/bin/env ruby
 
+require_relative '../backend/lib/git_repo'
+
 command = ARGV.shift
 
 case command
 when "init"
-  puts "INIT CALLED"
+  GitRepo.create
 else
   puts "Unknown command: #{command}"
 end
