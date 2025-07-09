@@ -35,4 +35,28 @@ RSpec.describe GitRepo do
     content = File.read(head_path)
     expect(content.strip).to eq ("ref: refs/heads/master")
   end
+
+  describe '#hash_object' do
+    let(:filename) { "test.txt" }
+    let(:content) { "hello world" }
+
+    before do
+      File.write(filename, content)
+    end
+
+    it 'returns correct SHA-1 hash of blob content' do
+      blob = "blob #{content.bytesize}\0#{content}"
+      expected_hash = Digest::SHA1.hexdigest(blob)
+
+      result = GitRepo.hash_object(filename)
+      expect(result).to eq(expected_hash)
+    end
+
+    it 'produces same hash as real Git' do
+      expected_hash = `git hash-object #{filename}`.strip
+      result = GitRepo.hash_object(filename)
+
+      expect(result).to eq(expected_hash)
+    end
+  end
 end
