@@ -9,8 +9,7 @@ class GitRepo
     Dir.mkdir(".mygit")
     Dir.mkdir(".mygit/objects")
     Dir.mkdir(".mygit/refs")
-    Dir.mkdir(".mygit/HEAD")
-
+    File.write(".mygit/HEAD", "ref: refs/heads/master\n")
   end
 
   def repo_exist?
