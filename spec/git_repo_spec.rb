@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'tmpdir'
-require_relative "../backend/lib/git_repo"
+require_relative '../backend/lib/git_repo'
 
 RSpec.describe GitRepo do
   around(:each) do |example|
@@ -33,12 +35,12 @@ RSpec.describe GitRepo do
     expect(File.exist?(head_path)).to be true
 
     content = File.read(head_path)
-    expect(content.strip).to eq ("ref: refs/heads/master")
+    expect(content.strip).to eq('ref: refs/heads/master')
   end
 
   describe '#hash_object' do
-    let(:filename) { "test.txt" }
-    let(:content) { "hello world" }
+    let(:filename) { 'test.txt' }
+    let(:content) { 'hello world' }
 
     before do
       File.write(filename, content)
@@ -48,15 +50,39 @@ RSpec.describe GitRepo do
       blob = "blob #{content.bytesize}\0#{content}"
       expected_hash = Digest::SHA1.hexdigest(blob)
 
-      result = GitRepo.hash_object(filename)
+      result = GitRepo.hash_object(filename, write: false)
       expect(result).to eq(expected_hash)
     end
 
     it 'produces same hash as real Git' do
       expected_hash = `git hash-object #{filename}`.strip
-      result = GitRepo.hash_object(filename)
+      result = GitRepo.hash_object(filename, write: false)
 
       expect(result).to eq(expected_hash)
+    end
+
+    it 'writes the compressed blob to the correct path when write is true' do
+      result = GitRepo.hash_object(filename, write: true)
+
+      dir = result[0..1]
+      file = result[2..]
+      path = ".mygit/objects/#{dir}/#{file}"
+
+      expect(File.exist?(path)).to be true
+    end
+
+    it 'writes the correct zlib-compressed blob content' do
+      result = GitRepo.hash_object(filename, write: true)
+
+      dir = result[0..1]
+      file = result[2..]
+      path = ".mygit/objects/#{dir}/#{file}"
+
+      compressed_data = File.binread(path)
+      decompressed = Zlib::Inflate.inflate(compressed_data)
+
+      expected_blob = "blob #{content.bytesize}\0#{content}"
+      expect(decompressed).to eq(expected_blob)
     end
   end
 end

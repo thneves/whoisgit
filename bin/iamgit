@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'optparse'
 require_relative '../backend/lib/git_repo'
 
@@ -17,7 +19,7 @@ when 'hash-object'
   options = { write: false }
 
   parser = OptionParser.new do |opts|
-    opts.banner = "Usage: iamgit hash-object [options] <file>"
+    opts.banner = 'Usage: iamgit hash-object [options] <file>'
 
     opts.on('-w', '--write', 'Write object to .mygit/objects') do
       options[:write] = true
@@ -29,43 +31,39 @@ when 'hash-object'
     end
   end
 
-  begin 
+  begin
     parser.parse!
 
     filename = ARGV.shift
 
-    abort_with("Error: Missing target file") if filename.nil?
-    
+    abort_with('Error: Missing target file') if filename.nil?
+
     hash = GitRepo.hash_object(filename, write: options[:write])
     puts hash
-  rescue OptionParser::InvalidOption => error
-    abort_with("Error: #{error.message}\n\n#{parser}")
+  rescue OptionParser::InvalidOption => e
+    abort_with("Error: #{e.message}\n\n#{parser}")
   end
 else
   puts "Unkown command: #{command}"
-  puts "Avaiable commands: init, hash-object"
+  puts 'Avaiable commands: init, hash-object'
   exit 1
 end
 
-
-=begin
-command = ARGV[0]
-
-if command == "hash-object"
-  flag = ARGV[1]
-  target = ARGV[2]
-end
-
-
-case command
-when "init"
-  GitRepo.create
-when "hash-object"
-  abort_with("Missing target input") if target.nil?
-  GitRepo.hash_object(flag, target)
-else
-  msg = "Unkonw command: #{command}"
-  abort_with(msg)
-end
-=end
-
+# command = ARGV[0]
+#
+# if command == "hash-object"
+#   flag = ARGV[1]
+#   target = ARGV[2]
+# end
+#
+#
+# case command
+# when "init"
+#   GitRepo.create
+# when "hash-object"
+#   abort_with("Missing target input") if target.nil?
+#   GitRepo.hash_object(flag, target)
+# else
+#   msg = "Unkonw command: #{command}"
+#   abort_with(msg)
+# end
