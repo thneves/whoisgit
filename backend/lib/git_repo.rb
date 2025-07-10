@@ -1,15 +1,21 @@
 require 'digest'
+require 'zlib'
+require 'fileutils'
+
 class GitRepo
   def self.create
     new.create
   end
 
-  def self.hash_object(file)
-    new.hash_object(file)
+  def self.hash_object(file, write:)
+    new.hash_object(file, write:)
   end
   
   def create
-    return "Already Exists" if Dir.exist? ".mygit" # Follow git and implement reinitialize repo
+    if Dir.exist? ".mygit"
+      puts "Mygit Already initialized"
+      exit 1
+    end
     
     Dir.mkdir(".mygit")
     Dir.mkdir(".mygit/objects")
@@ -17,11 +23,36 @@ class GitRepo
     File.write(".mygit/HEAD", "ref: refs/heads/master\n")
   end
 
-  def hash_object(file)
+  def hash_object(file, write: nil)
+    store = build_blob(file)
+    hashed_obj = Digest::SHA1.hexdigest(store)
+
+    return hashed_obj unless write
+    
+    hash_dir_name = hashed_obj.slice(0..1)
+    hash_dir = ".mygit/objects/#{hash_dir_name}"
+    filename = hashed_obj.slice(2..-1)
+    compressed_object = Zlib::Deflate.deflate(store)
+
+    write_file(hash_dir, filename, compressed_object)
+
+    hashed_obj
+  end
+
+  private
+
+  def write_file(dir, filename, compressed_file)
+    FileUtils.mkdir_p(dir)
+
+    File.open("#{dir}/#{filename}", "wb") do |f|
+      f.write(compressed_file)
+    end
+  end
+
+  def build_blob(file)
     content = File.read(file)
     size_in_bytes = content.bytesize
     header = "blob #{size_in_bytes}\0"
-    store = header + content
-    Digest::SHA1.hexdigest(store)
+    header + content
   end
 end
