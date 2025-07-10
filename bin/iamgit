@@ -49,21 +49,3 @@ else
   exit 1
 end
 
-# command = ARGV[0]
-#
-# if command == "hash-object"
-#   flag = ARGV[1]
-#   target = ARGV[2]
-# end
-#
-#
-# case command
-# when "init"
-#   GitRepo.create
-# when "hash-object"
-#   abort_with("Missing target input") if target.nil?
-#   GitRepo.hash_object(flag, target)
-# else
-#   msg = "Unkonw command: #{command}"
-#   abort_with(msg)
-# end
