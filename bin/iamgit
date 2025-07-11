@@ -59,11 +59,10 @@ when 'cat-file'
 
     hash = ARGV.shift
 
-    abort_with("Error: Missing hash") if hash.nil?
+    abort_with('Error: Missing hash') if hash.nil?
 
     hash_content = GitRepo.print(hash)
     puts hash_content
-
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
@@ -72,4 +71,3 @@ else
   puts 'Avaiable commands: init, hash-object, cat-file'
   exit 1
 end
-

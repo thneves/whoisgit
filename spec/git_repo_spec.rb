@@ -87,8 +87,8 @@ RSpec.describe GitRepo do
   end
 
   describe '#print' do
-    let(:filename) { "hello.txt" }
-    let(:content) { "hello from test" }
+    let(:filename) { 'hello.txt' }
+    let(:content) { 'hello from test' }
 
     before do
       File.write(filename, content)
