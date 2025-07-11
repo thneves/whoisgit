@@ -95,8 +95,8 @@ Ideal for:
 ## ✅ Roadmap
 
 - [x] `init` command + visual folder tree
-- [ ] `hash-object` command + blob storage animation
-- [ ] `cat-file` to inspect raw content
+- [x] `hash-object` command + blob storage animation
+- [x] `cat-file` to inspect raw content
 - [ ] `commit` → visual DAG node
 - [ ] `log` → visualize history
 - [ ] `branch`, `checkout`, `merge`
