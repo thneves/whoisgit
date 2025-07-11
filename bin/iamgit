@@ -43,9 +43,33 @@ when 'hash-object'
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
+when 'cat-file'
+  parser = OptionParser.new do |opts|
+    opts.banner = 'Usage: iamgit cat-file [options] <hash>'
+
+    opts.on('-p', '--print', 'Print content of a object')
+
+    opts.on('-h', '--help', 'Help message!') do
+      puts opts
+      exit
+    end
+  end
+  begin
+    parser.parse!
+
+    hash = ARGV.shift
+
+    abort_with("Error: Missing hash") if hash.nil?
+
+    hash_content = GitRepo.print(hash)
+    puts hash_content
+
+  rescue OptionParser::InvalidOption => e
+    abort_with("Error: #{e.message}\n\n#{parser}")
+  end
 else
   puts "Unkown command: #{command}"
-  puts 'Avaiable commands: init, hash-object'
+  puts 'Avaiable commands: init, hash-object, cat-file'
   exit 1
 end
 
