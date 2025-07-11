@@ -89,6 +89,9 @@ RSpec.describe GitRepo do
   describe '#print' do
     let(:filename) { 'hello.txt' }
     let(:content) { 'hello from test' }
+    let(:hash) { GitRepo.hash_object(filename, write: true) }
+    let(:content_mode) { 'content' }
+    let(:type_mode) { 'type' }
 
     before do
       File.write(filename, content)
@@ -96,8 +99,7 @@ RSpec.describe GitRepo do
     end
 
     it 'returns the original content of the blob' do
-      hash = GitRepo.hash_object(filename, write: true)
-      result = GitRepo.print(hash)
+      result = GitRepo.print(hash, content_mode)
 
       expect(result).to eq(content)
     end

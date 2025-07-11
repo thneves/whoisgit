@@ -50,10 +50,10 @@ when 'cat-file'
     opts.banner = 'Usage: iamgit cat-file [options] <hash>'
 
     opts.on('-p', '--pretty-print', 'Print content of a object') do
-      options[:print] = 'content'
+      options[:mode] = 'content'
     end
     opts.on('-t', '--object-type', 'Print the type of a object') do
-      options[:print] = 'type'
+      options[:mode] = 'type'
     end
 
     opts.on('-h', '--help', 'Help message!') do
@@ -70,7 +70,7 @@ when 'cat-file'
 
     abort_with('Error: Missing hash') if hash.nil?
 
-    print_value = GitRepo.print(hash, print: options[:print])
+    print_value = GitRepo.print(hash, mode: options[:print])
     puts print_value
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")

@@ -19,10 +19,9 @@ class GitRepo
     new.hash_object(file, write)
   end
 
-  def self.print(hash, print: nil)
-    new.print(hash, print)
+  def self.print(hash, mode)
+    new.print(hash, mode)
   end
-
 
   def create
     if Dir.exist? DIR_MYGIT
@@ -62,7 +61,7 @@ class GitRepo
   def decompress_file(hash)
     location = object_location(hash)
 
-    compressed_file = File.read("#{location[:dir]}/#{location[:filename]}")
+    compressed_file = File.binread("#{location[:dir]}/#{location[:filename]}")
 
     decompressed_file = Zlib::Inflate.inflate(compressed_file)
 
@@ -76,7 +75,7 @@ class GitRepo
 
   def object_location(hash)
     hash_dir_name = hash.slice 0..1
-    dir = "#{DIR_OBJECTS}#{hash_dir_name}"
+    dir = "#{DIR_OBJECTS}/#{hash_dir_name}"
     filename = hash.slice 2..-1
 
     {
