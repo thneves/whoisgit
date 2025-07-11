@@ -14,6 +14,10 @@ class GitRepo
     new.hash_object(file, write)
   end
 
+  def self.print(hash)
+    new.print(hash)
+  end
+
   def create
     if Dir.exist? '.mygit'
       puts 'Mygit Already initialized'
@@ -32,17 +36,38 @@ class GitRepo
 
     return hashed_obj unless write
 
-    hash_dir_name = hashed_obj.slice(0..1)
-    hash_dir = ".mygit/objects/#{hash_dir_name}"
-    filename = hashed_obj.slice(2..-1)
+    location = object_location(hashed_obj)
     compressed_object = Zlib::Deflate.deflate(store)
 
-    write_file(hash_dir, filename, compressed_object)
+    write_file(location[:dir], location[:filename], compressed_object)
 
     hashed_obj
   end
 
+  def print(hash)
+    location = object_location(hash)
+
+    compressed_file = File.read("#{location[:dir]}/#{location[:filename]}")
+
+    decompressed_file = Zlib::Inflate.inflate(compressed_file)
+
+    _, content = decompressed_file.split("\0", 2)
+    
+    content
+  end
+
   private
+
+  def object_location(hash)
+    hash_dir_name = hash.slice 0..1
+    dir = ".mygit/objects/#{hash_dir_name}"
+    filename = hash.slice 2..-1
+
+    {
+      dir:,
+      filename:
+    }
+  end
 
   def write_file(dir, filename, compressed_file)
     FileUtils.mkdir_p(dir)
