@@ -85,4 +85,21 @@ RSpec.describe GitRepo do
       expect(decompressed).to eq(expected_blob)
     end
   end
+
+  describe '#print' do
+    let(:filename) { "hello.txt" }
+    let(:content) { "hello from test" }
+
+    before do
+      File.write(filename, content)
+      GitRepo.create
+    end
+
+    it 'returns the original content of the blob' do
+      hash = GitRepo.hash_object(filename, write: true)
+      result = GitRepo.print(hash)
+
+      expect(result).to eq(content)
+    end
+  end
 end
