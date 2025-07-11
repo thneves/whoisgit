@@ -6,6 +6,11 @@ require 'fileutils'
 
 # Organize Git Structures
 class GitRepo
+  DIR_MYGIT = '.mygit'.freeze
+  DIR_OBJECTS = "#{DIR_MYGIT}/objects".freeze
+  DIR_REFS = "#{DIR_MYGIT}/refs".freeze
+  FILE_HEAD = "#{DIR_MYGIT}/HEAD".freeze
+
   def self.create
     new.create
   end
@@ -19,15 +24,15 @@ class GitRepo
   end
 
   def create
-    if Dir.exist? '.mygit'
+    if Dir.exist? DIR_MYGIT
       puts 'Mygit Already initialized'
       exit 1
     end
 
-    Dir.mkdir('.mygit')
-    Dir.mkdir('.mygit/objects')
-    Dir.mkdir('.mygit/refs')
-    File.write('.mygit/HEAD', "ref: refs/heads/master\n")
+    Dir.mkdir DIR_MYGIT
+    Dir.mkdir DIR_OBJECTS
+    Dir.mkdir DIR_REFS
+    File.write(FILE_HEAD, "ref: refs/heads/master\n")
   end
 
   def hash_object(file, write)
@@ -60,7 +65,7 @@ class GitRepo
 
   def object_location(hash)
     hash_dir_name = hash.slice 0..1
-    dir = ".mygit/objects/#{hash_dir_name}"
+    dir = "#{DIR_OBJECTS}#{hash_dir_name}"
     filename = hash.slice 2..-1
 
     {

@@ -47,7 +47,7 @@ when 'cat-file'
   parser = OptionParser.new do |opts|
     opts.banner = 'Usage: iamgit cat-file [options] <hash>'
 
-    opts.on('-p', '--print', 'Print content of a object')
+    opts.on('-p', '--pretty-print', 'Print content of a object')
 
     opts.on('-h', '--help', 'Help message!') do
       puts opts
