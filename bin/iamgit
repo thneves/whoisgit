@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
-require_relative '../backend/lib/git_repo'
+require_relative '../lib/git_repo'
 
 def abort_with(msg)
   puts msg
@@ -75,6 +75,9 @@ when 'cat-file'
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
+when 'write-tree'
+  tree = GitRepo.write_tree
+  puts tree
 else
   puts "Unkown command: #{command}"
   puts 'Avaiable commands: init, hash-object, cat-file'
