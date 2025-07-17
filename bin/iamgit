@@ -60,6 +60,7 @@ when 'cat-file'
       puts opts
       exit
     end
+
   end
   begin
     parser.parse!
@@ -78,6 +79,33 @@ when 'cat-file'
 when 'write-tree'
   tree = GitRepo.write_tree
   puts tree
+when 'commit'
+  options = {}
+
+  parser = OptionParser.new do |opts|
+    opts.banner = 'Usage: iamgit commit [options] <message>'
+
+    opts.on('-m', 'message', 'Describe commit') do
+      options[:message] = 'message'
+    end
+
+    opts.on('-h', '--help', 'Help message!') do
+      puts opts
+      exit
+    end
+  end
+  begin
+    parser.parse!
+
+    commit_message = ARGV.shift
+
+    tree = GitRepo.write_tree
+
+    GitRepo.commit(tree, commit_message)
+
+  rescue OptionParser::InvalidOption => e
+    abort_with("Error: #{e.message}\n\n#{parser}")
+  end
 else
   puts "Unkown command: #{command}"
   puts 'Avaiable commands: init, hash-object, cat-file'

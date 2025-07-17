@@ -28,6 +28,10 @@ class GitRepo
     new.write_tree
   end
 
+  def self.commit(tree, message, parent = nil)
+    new.commit(tree, message, parent)
+  end
+
   def create
     if Dir.exist? DIR_MYGIT
       puts 'Mygit Already initialized'
@@ -83,7 +87,6 @@ class GitRepo
       entries << "#{mode} #{entry}\0" + binary_hash # "100644 .filename \0 binary"
     end
 
-
     tree_content = entries.join
     store = "tree #{tree_content.bytesize}\0" + tree_content
     sha = Digest::SHA1.hexdigest(store)
@@ -96,6 +99,10 @@ class GitRepo
     end
 
     sha
+  end
+
+  def commit(tree, message, parent)
+    
   end
 
   private
