@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require 'optparse'
-require 'byebug'
 require_relative '../lib/git_repo'
 
 def abort_with(msg)
@@ -84,7 +83,7 @@ when 'commit'
   options = {}
 
   parser = OptionParser.new do |opts|
-    opts.banner = 'Usage: iamgit commit [options] <message>'
+    opts.banner = 'Usage: iamgit commit -m "message"'
 
     opts.on('-m', 'message', 'Describe commit') do
       options[:message] = 'message'

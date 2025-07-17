@@ -102,27 +102,35 @@ class GitRepo
   end
 
   def commit(tree, message, parent)
-    size = tree.bytesize
+    timestamp = Time.now.to_i
 
-    store = "commit #{size}\0\n
-             tree #{tree}\n
-             author thales thales@iamgit.com #{Time.now.to_i} +0000\n
-             committer thales thales@iamgit.com #{Time.now.to_i} +0000\n
-             #{message}
-            "
-     puts store
 
-     sha1 = Digest::SHA1.hexdigest(store)
+    commit_body = "tree #{tree}\n"
+    commit_body << "parent #{parent}" if parent
+    commit_body << "author thales thales@iamgit.com #{timestamp} +0000\n"
+    commit_body << "committer thales thales@iamgit.com #{timestamp} +0000\n"
+    commit_body << message
+    
+    size = commit_body.bytesize
+    commit_header = "commit #{size}\0"
 
-     compressed = Zlib::Deflate.deflate(sha1)
+    store = commit_header + commit_body
+    
+    puts store
 
-     File.write("#{DIR_OBJECTS}/#{sha1}", compressed)
+    sha1 = Digest::SHA1.hexdigest(store)
+    compressed = Zlib::Deflate.deflate(store)
 
-     sha1
+    dir = "#{DIR_OBJECTS}/#{sha1[0..1]}"
+    filename = sha1[2..]
+
+    FileUtils.mkdir_p(dir)
+    File.open("#{dir}/#{filename}", 'wb') { |f| f.write(compressed)}
+
+    sha1
   end
 
   private
-
 
   def decompress_file(hash)
     location = object_location(hash)
