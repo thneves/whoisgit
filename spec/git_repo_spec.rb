@@ -168,4 +168,56 @@ RSpec.describe GitRepo do
       expect(src_body).to include("100644 app.rb")
     end
   end
+  describe '#commit' do
+    let(:tree_sha) { 'a1b2c3d4e5f678901234567890abcdefabcdef12' }
+    let(:message) { 'initial commit' }
+    let(:parent_sha) { 'f1e2d3c4b5a678901234567890abcdefabcdef00' }
+    let(:timestamp) { 1_752_717_000 }
+
+    before do
+      allow(Time).to receive(:now).and_return(Time.at(timestamp))
+      FileUtils.mkdir_p(GitRepo::DIR_OBJECTS)
+    end
+
+    after do
+      FileUtils.rm_rf(GitRepo::DIR_MYGIT)
+    end
+
+    it 'creates a valid commit object with parent' do
+      sha = subject.commit(tree_sha, message, parent_sha)
+
+      expect(sha).to match(/\A\h{40}\z/)
+
+      dir = "#{GitRepo::DIR_OBJECTS}/#{sha[0..1]}"
+      file = "#{dir}/#{sha[2..]}"
+      expect(File.exist?(file)).to be true
+
+      compressed = File.binread(file)
+      decompressed = Zlib::Inflate.inflate(compressed)
+
+      expected_body = <<~BODY
+        tree #{tree_sha}
+        parent #{parent_sha}author thales thales@iamgit.com #{timestamp} +0000
+        committer thales thales@iamgit.com #{timestamp} +0000
+        #{message}
+      BODY
+
+      expected_header = "commit #{expected_body.bytesize}\0"
+
+      expect(decompressed).to eq(expected_header + expected_body)
+    end
+
+    it 'creates a valid commit object without parent' do
+      sha = subject.commit(tree_sha, message, nil)
+
+      dir = "#{GitRepo::DIR_OBJECTS}/#{sha[0..1]}"
+      file = "#{dir}/#{sha[2..]}"
+      decompressed = Zlib::Inflate.inflate(File.binread(file))
+
+      expect(decompressed).to include("tree #{tree_sha}")
+      expect(decompressed).not_to include("parent")
+      expect(decompressed).to include("author thales thales@iamgit.com #{timestamp}")
+      expect(decompressed).to include(message)
+    end
+  end
 end
