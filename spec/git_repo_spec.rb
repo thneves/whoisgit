@@ -2,7 +2,9 @@
 
 require 'fileutils'
 require 'tmpdir'
-require_relative '../backend/lib/git_repo'
+require 'zlib'
+require 'digest'
+require_relative '..//lib/git_repo'
 
 RSpec.describe GitRepo do
   around(:each) do |example|
@@ -102,6 +104,68 @@ RSpec.describe GitRepo do
       result = GitRepo.print(hash, content_mode)
 
       expect(result).to eq(content)
+    end
+  end
+
+  describe '#write_tree' do
+    let(:repo) { GitRepo.new }
+
+    before do
+      File.write('file1.txt', 'Hello')
+      File.write('.gitignore', '*.log')
+      FileUtils.mkdir_p('src')
+      File.write('src/app.rb', 'puts "hi"')
+    end
+
+    it 'writes a tree object with correct SHA and content' do
+      tree_sha = repo.write_tree
+
+      # Load tree object from .mygit/objects
+      dir = ".mygit/objects/#{tree_sha[0..1]}"
+      file = "#{dir}/#{tree_sha[2..]}"
+      compressed = File.binread(file)
+      decompressed = Zlib::Inflate.inflate(compressed)
+
+      expect(decompressed).to start_with("tree ")
+
+      _, body = decompressed.split("\0", 2)
+
+      expect(body).to include("100644 file1.txt")
+      expect(body).to include("100644 .gitignore")
+      expect(body).to include("40000 src")
+
+      # Ensure it contains valid binary SHA hashes (20 bytes after each \0)
+      entries = body.scan(/(100644|40000) [^\0]+\0(.{20})/m)
+      entries.each do |(_, binary_hash)|
+        expect(binary_hash.bytesize).to eq(20)
+      end
+    end
+
+    it 'recursively includes subdirectories and their files' do
+      tree_sha = repo.write_tree
+
+      dir = ".mygit/objects/#{tree_sha[0..1]}"
+      file = "#{dir}/#{tree_sha[2..]}"
+      compressed = File.binread(file)
+      decompressed = Zlib::Inflate.inflate(compressed)
+
+      _, body = decompressed.split("\0", 2)
+
+      # Confirm that 'src/app.rb' content was written to .mygit/objects
+      expect(body).to include("40000 src")
+
+      # Extract the SHA of 'src' tree
+      src_entry = body[/40000 src\0(.{20})/m, 1]
+      src_sha = src_entry.unpack1("H*")
+
+      src_dir = ".mygit/objects/#{src_sha[0..1]}"
+      src_file = "#{src_dir}/#{src_sha[2..]}"
+      src_compressed = File.binread(src_file)
+      src_decompressed = Zlib::Inflate.inflate(src_compressed)
+
+      _, src_body = src_decompressed.split("\0", 2)
+
+      expect(src_body).to include("100644 app.rb")
     end
   end
 end
