@@ -102,7 +102,24 @@ class GitRepo
   end
 
   def commit(tree, message, parent)
-    byebug
+    size = tree.bytesize
+
+    store = "commit #{size}\0\n
+             tree #{tree}\n
+             parent fake-parent\n
+             author thales thales@iamgit.com #{Time.now.to_i} +0000\n
+             commiter thales thales@iamgit.com #{Time.now.to_i} +0000\n
+             #{message}
+            "
+     puts store
+
+     sha1 = Digest::SHA1.hexdigest(store)
+
+     compressed = Zlib::Deflate.deflate(sha1)
+
+     File.write("#{DIR_OBJECTS}/#{sha1}", compressed)
+
+     sha1
   end
 
   private

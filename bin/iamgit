@@ -105,7 +105,8 @@ when 'commit'
 
     tree = GitRepo.write_tree
 
-    GitRepo.commit(tree, commit_message)
+    commit = GitRepo.commit(tree, commit_message)
+    puts commit
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
