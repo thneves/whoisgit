@@ -102,7 +102,7 @@ class GitRepo
   end
 
   def commit(tree, message, parent)
-    
+    byebug
   end
 
   private

@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'byebug'
 require_relative '../lib/git_repo'
 
 def abort_with(msg)
@@ -99,10 +100,12 @@ when 'commit'
 
     commit_message = ARGV.shift
 
+    abort_with('Error: Commit Message missing') if commit_message.nil?
+    abort_with('Error: Message too short, min 3 chars.') if commit_message.size < 3
+
     tree = GitRepo.write_tree
 
     GitRepo.commit(tree, commit_message)
-
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
