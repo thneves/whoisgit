@@ -106,9 +106,8 @@ class GitRepo
 
     store = "commit #{size}\0\n
              tree #{tree}\n
-             parent fake-parent\n
              author thales thales@iamgit.com #{Time.now.to_i} +0000\n
-             commiter thales thales@iamgit.com #{Time.now.to_i} +0000\n
+             committer thales thales@iamgit.com #{Time.now.to_i} +0000\n
              #{message}
             "
      puts store
