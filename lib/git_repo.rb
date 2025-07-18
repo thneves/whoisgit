@@ -28,8 +28,8 @@ class GitRepo
     new.write_tree
   end
 
-  def self.commit(tree, message, parent = nil)
-    new.commit(tree, message, parent)
+  def self.commit(tree, message)
+    new.commit(tree, message)
   end
 
   def create
@@ -101,12 +101,16 @@ class GitRepo
     sha
   end
 
-  def commit(tree, message, parent)
+  def commit(tree, message)
     timestamp = Time.now.to_i
 
+    head_ref = File.read(FILE_HEAD).strip.split.last
+    ref_path = File.join(DIR_MYGIT, head_ref)
+
+    parent = File.exist?(ref_path) ? File.read(ref_path).strip : nil
 
     commit_body = "tree #{tree}\n"
-    commit_body << "parent #{parent}" if parent
+    commit_body << "parent #{parent}\n" if parent
     commit_body << "author thales thales@iamgit.com #{timestamp} +0000\n"
     commit_body << "committer thales thales@iamgit.com #{timestamp} +0000\n"
     commit_body << message
@@ -126,7 +130,9 @@ class GitRepo
 
     FileUtils.mkdir_p(dir)
     File.open("#{dir}/#{filename}", 'wb') { |f| f.write(compressed)}
-
+    FileUtils.mkdir_p(File.dirname(ref_path))
+    File.write(ref_path, sha1)
+    
     sha1
   end
 
