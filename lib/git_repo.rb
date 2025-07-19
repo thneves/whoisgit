@@ -32,6 +32,10 @@ class GitRepo
     new.commit(tree, message)
   end
 
+  def self.add(files)
+    new.add(files)
+  end
+
   def create
     if Dir.exist? DIR_MYGIT
       puts 'Mygit Already initialized'
@@ -135,6 +139,11 @@ class GitRepo
     
     sha1
   end
+
+  def add(files)
+    puts files
+  end
+
 
   private
 

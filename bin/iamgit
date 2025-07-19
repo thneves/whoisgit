@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'byebug'
 require_relative '../lib/git_repo'
 
 def abort_with(msg)
@@ -109,6 +110,36 @@ when 'commit'
     puts commit
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
+  end
+when 'add'
+  options = {}
+
+  parser = OptionParser.new do |opts|
+    opts.banner = 'Usage: iamgit add <file>'
+
+    opts.on('-h', '--help', 'Help message!') do
+      puts opts
+      exit
+    end
+  end
+  begin
+    parser.parse!
+
+    files = ARGV
+
+    files_found = []
+
+    files.each do |filename|
+      found = Dir.glob("**/#{filename}").find {|f| File.file? f }
+      
+      abort_with("fatal: pathspec '#{filename}' did not match anyfile") unless found
+
+      files_found << found
+    end
+
+    GitRepo.add(files_found)
+
+   # puts File.exist?(filename)
   end
 else
   puts "Unkown command: #{command}"
