@@ -41,7 +41,7 @@ class GitRepo
     Dir.mkdir DIR_MYGIT
     Dir.mkdir DIR_OBJECTS
     Dir.mkdir DIR_REFS
-    File.write(FILE_HEAD, "ref: refs/heads/master\n")
+    File.write(FILE_HEAD, "ref: refs/heads/main\n")
   end
 
   def hash_object(file, write)
