@@ -7,10 +7,11 @@ require 'byebug'
 
 # Organize Git Structures
 class GitRepo
-  DIR_MYGIT = '.mygit'.freeze
-  DIR_OBJECTS = "#{DIR_MYGIT}/objects".freeze
-  DIR_REFS = "#{DIR_MYGIT}/refs".freeze
-  FILE_HEAD = "#{DIR_MYGIT}/HEAD".freeze
+  MYGIT_DIR = '.mygit'.freeze
+  OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
+  REFS_DIR = "#{MYGIT_DIR}/refs".freeze
+  HEAD_FILE = "#{MYGIT_DIR}/HEAD".freeze
+  INDEX_FILE = "#{MYGIT_DIR}/index".freeze
 
   def self.create
     new.create
@@ -37,14 +38,14 @@ class GitRepo
   end
 
   def create
-    if Dir.exist? DIR_MYGIT
+    if Dir.exist? MYGIT_DIR
       puts 'Mygit Already initialized'
       exit 1
     end
 
-    Dir.mkdir DIR_MYGIT
-    Dir.mkdir DIR_OBJECTS
-    Dir.mkdir DIR_REFS
+    Dir.mkdir MYGIT_DIR
+    Dir.mkdir OBJECTS_DIR
+    Dir.mkdir REFS_DIR
     File.write(FILE_HEAD, "ref: refs/heads/main\n")
   end
 
@@ -95,7 +96,7 @@ class GitRepo
     store = "tree #{tree_content.bytesize}\0" + tree_content
     sha = Digest::SHA1.hexdigest(store)
 
-    dir_name = "#{DIR_OBJECTS}/#{sha[0..1]}"
+    dir_name = "#{OBJECTS_DIR}/#{sha[0..1]}"
     file_name = sha[2..]
     FileUtils.mkdir_p(dir_name)
     File.open("#{dir_name}/#{file_name}", 'wb') do |f|
@@ -109,7 +110,7 @@ class GitRepo
     timestamp = Time.now.to_i
 
     head_ref = File.read(FILE_HEAD).strip.split.last
-    ref_path = File.join(DIR_MYGIT, head_ref)
+    ref_path = File.join(MYGIT_DIR, head_ref)
 
     parent = File.exist?(ref_path) ? File.read(ref_path).strip : nil
 
@@ -129,7 +130,7 @@ class GitRepo
     sha1 = Digest::SHA1.hexdigest(store)
     compressed = Zlib::Deflate.deflate(store)
 
-    dir = "#{DIR_OBJECTS}/#{sha1[0..1]}"
+    dir = "#{OBJECTS_DIR}/#{sha1[0..1]}"
     filename = sha1[2..]
 
     FileUtils.mkdir_p(dir)
@@ -141,9 +142,43 @@ class GitRepo
   end
 
   def add(files)
-    puts files
+    # checking if files were in the index at first place!!
+    File.write(INDEX_FILE, '') if !File.exist?(INDEX_FILE) 
+    
+    modified_files = []
+
+    files.each do |file|
+      indexed = File.read(INDEX_FILE).include?(file)
+      if indexed
+        current_sha = hash_object(file, write: false)
+        indexed_sha = ''
+        
+        lines = File.readlines(INDEX_FILE)
+
+        lines.map! do |line|
+          next if !line.include?(file)
+          indexed_sha = line.strip.split.last
+          line = new_index_entry(file) if current_sha != indexed_sha
+        end
+        File.write(INDEX_FILE, lines.join) if current_sha != indexed_sha
+      else
+        modified_files << file
+      end
+    end
+    
+    # writing files to index
+    modified_files.each do |file|
+      new_entry = new_index_entry(file)
+      File.write(INDEX_FILE, new_entry, mode: 'a+') #append mode
+    end
   end
 
+  def new_index_entry(file)
+    mode = '100644'
+    blob = build_blob(file)
+    sha1 = Digest::SHA1.hexdigest(blob)
+    "#{mode} #{file} #{sha1}\n"
+  end
 
   private
 
@@ -164,7 +199,7 @@ class GitRepo
 
   def object_location(hash)
     hash_dir_name = hash.slice 0..1
-    dir = "#{DIR_OBJECTS}/#{hash_dir_name}"
+    dir = "#{OBJECTS_DIR}/#{hash_dir_name}"
     filename = hash.slice 2..-1
 
     {

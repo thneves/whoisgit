@@ -126,8 +126,12 @@ when 'add'
     parser.parse!
 
     files = ARGV
-
     files_found = []
+
+    if files.include? '.'
+      GitRepo.add(['.'])
+      return
+    end
 
     files.each do |filename|
       found = Dir.glob("**/#{filename}").find {|f| File.file? f }
@@ -138,8 +142,8 @@ when 'add'
     end
 
     GitRepo.add(files_found)
-
-   # puts File.exist?(filename)
+  rescue OptionParser::InvalidOption => e
+    abort_with("Error: #{e.message}\n\n#{parser}")
   end
 else
   puts "Unkown command: #{command}"
