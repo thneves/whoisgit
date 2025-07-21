@@ -4,6 +4,7 @@
 require 'optparse'
 require 'byebug'
 require_relative '../lib/repository'
+require_relative '../lib/tree'
 
 def abort_with(msg)
   puts msg
@@ -77,8 +78,8 @@ when 'cat-file'
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
 when 'write-tree'
-  GitRepo.create
-  tree = GitRepo.write_tree
+  Repository.create
+  tree = Tree.write
   puts tree
 when 'commit'
   options = {}
