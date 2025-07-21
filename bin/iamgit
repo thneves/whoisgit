@@ -7,6 +7,7 @@ require_relative '../lib/repository'
 require_relative '../lib/tree'
 require_relative '../lib/hash_object'
 require_relative '../lib/cat_file'
+require_relative '../lib/commit'
 
 def abort_with(msg)
   puts msg
@@ -106,9 +107,11 @@ when 'commit'
     abort_with('Error: Commit Message missing') if commit_message.nil?
     abort_with('Error: Message too short, min 3 chars.') if commit_message.size < 3
 
-    tree = GitRepo.write_tree
 
-    commit = GitRepo.commit(tree, commit_message)
+    Repository.create
+    tree = Tree.write
+
+    commit = Commit.call(tree, commit_message)
     puts commit
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
