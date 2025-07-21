@@ -5,6 +5,7 @@ require 'optparse'
 require 'byebug'
 require_relative '../lib/repository'
 require_relative '../lib/tree'
+require_relative '../lib/hash_object'
 
 def abort_with(msg)
   puts msg
@@ -39,7 +40,7 @@ when 'hash-object'
 
     abort_with('Error: Missing target file') if filename.nil?
 
-    hash = GitRepo.hash_object(filename, write: options[:write])
+    hash = HashObject.call(filename, write: options[:write])
     puts hash
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
