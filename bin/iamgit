@@ -3,7 +3,7 @@
 
 require 'optparse'
 require 'byebug'
-require_relative '../lib/git_repo'
+require_relative '../lib/repository'
 
 def abort_with(msg)
   puts msg
@@ -14,8 +14,7 @@ top_command = ARGV.shift
 
 case top_command
 when 'init'
-  GitRepo.create
-
+  Repository.create
 when 'hash-object'
   options = { write: false }
 

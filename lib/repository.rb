@@ -6,7 +6,7 @@ require 'fileutils'
 require 'byebug'
 
 # Organize Git Structures
-class GitRepo
+class Repository
   MYGIT_DIR = '.mygit'.freeze
   OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
   REFS_DIR = "#{MYGIT_DIR}/refs".freeze
