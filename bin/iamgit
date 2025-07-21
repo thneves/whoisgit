@@ -6,6 +6,7 @@ require 'byebug'
 require_relative '../lib/repository'
 require_relative '../lib/tree'
 require_relative '../lib/hash_object'
+require_relative '../lib/cat_file'
 
 def abort_with(msg)
   puts msg
@@ -73,7 +74,7 @@ when 'cat-file'
 
     abort_with('Error: Missing hash') if hash.nil?
 
-    print_value = GitRepo.print(hash, mode: options[:print])
+    print_value = CatFile.call(hash, options[:mode])
     puts print_value
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
