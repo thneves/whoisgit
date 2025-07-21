@@ -8,6 +8,7 @@ require_relative '../lib/tree'
 require_relative '../lib/hash_object'
 require_relative '../lib/cat_file'
 require_relative '../lib/commit'
+require_relative '../lib/staging'
 
 def abort_with(msg)
   puts msg
@@ -107,7 +108,6 @@ when 'commit'
     abort_with('Error: Commit Message missing') if commit_message.nil?
     abort_with('Error: Message too short, min 3 chars.') if commit_message.size < 3
 
-
     Repository.create
     tree = Tree.write
 
@@ -134,7 +134,7 @@ when 'add'
     files_found = []
 
     if files.include? '.'
-      GitRepo.add(['.'])
+      Staging.add(['.'])
       return
     end
 
@@ -146,7 +146,7 @@ when 'add'
       files_found << found
     end
 
-    GitRepo.add(files_found)
+    Staging.add(files_found)
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
