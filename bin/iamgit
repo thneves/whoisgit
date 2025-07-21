@@ -19,7 +19,7 @@ top_command = ARGV.shift
 
 case top_command
 when 'init'
-  Repository.create
+  Repository.init
 when 'hash-object'
   options = { write: false }
 
@@ -82,7 +82,7 @@ when 'cat-file'
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
 when 'write-tree'
-  Repository.create
+  Repository.init
   tree = Tree.write
   puts tree
 when 'commit'
@@ -108,7 +108,7 @@ when 'commit'
     abort_with('Error: Commit Message missing') if commit_message.nil?
     abort_with('Error: Message too short, min 3 chars.') if commit_message.size < 3
 
-    Repository.create
+    Repository.init
     tree = Tree.write
 
     commit = Commit.call(tree, commit_message)
