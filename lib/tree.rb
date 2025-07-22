@@ -1,6 +1,7 @@
+require_relative 'constants'
+
 class Tree
-  MYGIT_DIR = '.mygit'.freeze
-  OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
+  include Constants
 
   def self.write
     new.write

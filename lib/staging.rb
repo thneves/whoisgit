@@ -1,8 +1,8 @@
-class Staging
-  MYGIT_DIR = '.mygit'.freeze
-  OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
-  INDEX_FILE = "#{MYGIT_DIR}/index".freeze
+require_relative 'constants'
 
+class Staging
+  include Constants  
+  
   def self.add(files)
     new.add(files)
   end

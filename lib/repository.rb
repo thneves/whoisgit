@@ -1,11 +1,8 @@
 # frozen_string_literal: true
-
+require_relative 'constants'
 # Create initial .mygit directories and subfolders structure
 module Repository
-  MYGIT_DIR = '.mygit'.freeze
-  OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
-  REFS_DIR = "#{MYGIT_DIR}/refs".freeze
-  HEAD_FILE = "#{MYGIT_DIR}/HEAD".freeze
+  include Constants
 
   def self.init
     if Dir.exist? MYGIT_DIR

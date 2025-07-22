@@ -1,7 +1,7 @@
+require_relative 'constants'
+
 class Commit
-  MYGIT_DIR = '.mygit'.freeze
-  OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
-  HEAD_FILE = "#{MYGIT_DIR}/HEAD".freeze
+  include Constants
 
   def self.call(tree, message)
     new.call(tree, message)

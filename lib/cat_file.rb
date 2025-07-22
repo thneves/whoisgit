@@ -1,7 +1,6 @@
-class CatFile
-  MYGIT_DIR = '.mygit'.freeze
-  OBJECTS_DIR = "#{MYGIT_DIR}/objects".freeze
+require_relative 'constants'
 
+class CatFile
   def self.call(hash, mode)
     new.call(hash, mode)
   end
