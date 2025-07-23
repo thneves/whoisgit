@@ -49,4 +49,11 @@ class Staging
     sha1 = Digest::SHA1.hexdigest(blob)
     "#{mode} #{file} #{sha1}\n"
   end
+
+  def build_blob(file)
+    content = File.read(file)
+    size_in_bytes = content.bytesize
+    header = "blob #{size_in_bytes}\0"
+    header + content
+  end
 end
