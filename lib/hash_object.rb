@@ -3,9 +3,11 @@ require 'digest'
 require 'zlib'
 require 'fileutils'
 require_relative 'constants'
+require_relative 'commons'
 
 class HashObject
   include Constants
+  include Commons
 
   def self.call(file, write)
     new.call(file, write)
@@ -20,19 +22,12 @@ class HashObject
     location = object_location(hashed_obj)
     compressed_object = Zlib::Deflate.deflate(store)
 
-    write_file(location[:dir], location[:filename], compressed_object)
+    write_binary_file(location[:dir], location[:filename], compressed_object)
 
     hashed_obj
   end
 
   private
-
-  def build_blob(file)
-    content = File.read(file)
-    size_in_bytes = content.bytesize
-    header = "blob #{size_in_bytes}\0"
-    header + content
-  end
 
   def object_location(hash)
     hash_dir_name = hash.slice 0..1
@@ -43,13 +38,5 @@ class HashObject
       dir:,
       filename:
     }
-  end
-
-  def write_file(dir, filename, compressed_file)
-    FileUtils.mkdir_p(dir)
-
-    File.open("#{dir}/#{filename}", 'wb') do |f|
-      f.write(compressed_file)
-    end
   end
 end

@@ -1,9 +1,11 @@
 require 'digest'
 require_relative 'constants'
 require_relative 'hash_object'
+require_relative 'commons'
 
 class Staging
-  include Constants  
+  include Constants
+  include Commons
   
   def self.add(files)
     new.add(files)
@@ -48,12 +50,5 @@ class Staging
     blob = build_blob(file)
     sha1 = Digest::SHA1.hexdigest(blob)
     "#{mode} #{file} #{sha1}\n"
-  end
-
-  def build_blob(file)
-    content = File.read(file)
-    size_in_bytes = content.bytesize
-    header = "blob #{size_in_bytes}\0"
-    header + content
   end
 end
