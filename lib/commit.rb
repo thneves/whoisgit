@@ -1,3 +1,7 @@
+require 'digest'
+require 'fileutils'
+require 'zlib'
+
 require_relative 'constants'
 
 class Commit

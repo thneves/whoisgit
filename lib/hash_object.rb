@@ -1,4 +1,7 @@
 
+require 'digest'
+require 'zlib'
+require 'fileutils'
 require_relative 'constants'
 
 class HashObject
