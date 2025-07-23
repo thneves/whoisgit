@@ -1,8 +1,10 @@
 require_relative 'constants'
 require_relative 'hash_object'
+require_relative 'commons'
 
 class Tree
   include Constants
+  include Commons
 
   def self.write
     new.write
@@ -33,13 +35,12 @@ class Tree
     tree_content = entries.join
     store = "tree #{tree_content.bytesize}\0" + tree_content
     sha = Digest::SHA1.hexdigest(store)
+    compressed_store = Zlib::Deflate.deflate(store)
 
     dir_name = "#{OBJECTS_DIR}/#{sha[0..1]}"
-    file_name = sha[2..]
-    FileUtils.mkdir_p(dir_name)
-    File.open("#{dir_name}/#{file_name}", 'wb') do |f|
-      f.write(Zlib::Deflate.deflate(store))
-    end
+    filename = sha[2..]
+
+    write_binary_file(dir_name, filename, compressed_store)
 
     sha
   end

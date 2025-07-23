@@ -3,9 +3,11 @@ require 'fileutils'
 require 'zlib'
 
 require_relative 'constants'
+require_relative 'commons'
 
 class Commit
   include Constants
+  include Commons
 
   def self.call(tree, message)
     new.call(tree, message)
@@ -30,22 +32,17 @@ class Commit
     dir = "#{OBJECTS_DIR}/#{sha1[0..1]}"
     filename = sha1[2..]
 
-    make_binary_file(dir, filename, compressed)
-    make_sha_file(ref_path, sha1)
+    write_binary_file(dir, filename, compressed)
+    write_sha_file(ref_path, sha1)
 
     sha1
   end
 
   private
 
-  def make_binary_file(dir, filename, compressed_file)
-    FileUtils.mkdir_p(dir)
-    File.open("#{dir}/#{filename}", 'wb') {|f| f.write(compressed_file)}
-  end
-
-  def make_sha_file(ref_path,sha)
+  def write_sha_file(ref_path,sha)
     FileUtils.mkdir_p(File.dirname(ref_path))
-    File.write(ref_path)
+    File.write(ref_path, sha)
   end
 
   def commit_body(tree, message, parent)
