@@ -19,10 +19,11 @@ class Commit
 
     parent = File.exist?(ref_path) ? File.read(ref_path).strip : nil
 
-    size = commit_body.bytesize
+    body = commit_body(tree, message, parent)
+    size = body.bytesize
     header = "commit #{size} \0"
 
-    store = header + commit_body(tree, message, parent)
+    store = header + body
     
     puts store
 

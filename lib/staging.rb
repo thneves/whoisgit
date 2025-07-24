@@ -11,7 +11,7 @@ class Staging
     new.add(files)
   end
 
-  def add(files)
+  def self.add(files)
     # checking if files were in the index at first place!!
     File.write(INDEX_FILE, '') if !File.exist?(INDEX_FILE) 
     

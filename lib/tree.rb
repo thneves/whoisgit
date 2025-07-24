@@ -10,7 +10,7 @@ class Tree
     new.write
   end
 
-  def write(dir = Dir.pwd) # takes dir from the project
+  def write(dir = Dir.pwd)
     entries = []
     keep_entries = ['.gitignore', '.rspec']
 

@@ -9,6 +9,7 @@ require_relative '../lib/hash_object'
 require_relative '../lib/cat_file'
 require_relative '../lib/commit'
 require_relative '../lib/staging'
+require_relative '../lib/status'
 
 def abort_with(msg)
   puts msg
@@ -147,6 +148,22 @@ when 'add'
     end
 
     Staging.add(files_found)
+  rescue OptionParser::InvalidOption => e
+    abort_with("Error: #{e.message}\n\n#{parser}")
+  end
+when 'status'
+  parser = OptionParser.new do |opts|
+    opts.banner = 'Usage: iamgit status'
+
+    opts.on('-h', '--help', 'Help Message!') do
+      puts opts
+      exit
+    end
+  end
+  begin
+    parser.parse!
+    
+    Status.check
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
