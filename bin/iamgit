@@ -163,7 +163,7 @@ when 'status'
   begin
     parser.parse!
     
-    Status.check
+    Staging.status
   rescue OptionParser::InvalidOption => e
     abort_with("Error: #{e.message}\n\n#{parser}")
   end
