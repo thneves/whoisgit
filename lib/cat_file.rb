@@ -1,6 +1,8 @@
 require_relative 'constants'
 
 class CatFile
+  include Constants
+
   def self.call(hash, mode)
     new.call(hash, mode)
   end
