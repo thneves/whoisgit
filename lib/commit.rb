@@ -47,7 +47,7 @@ class Commit
   end
 
   def commit_body(tree, message, parent)
-    timestamp = Time.now.i
+    timestamp = Time.now.to_i
 
     commit_body = "tree #{tree}\n"
     commit_body << "parent #{parent}\n" if parent
