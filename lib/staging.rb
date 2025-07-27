@@ -11,7 +11,7 @@ class Staging
     new.add(files)
   end
 
-  def self.add(files)
+  def add(files)
     # checking if files were in the index at first place!!
     File.write(INDEX_FILE, '') if !File.exist?(INDEX_FILE) 
     
@@ -38,6 +38,7 @@ class Staging
     
     # writing files to index
     modified_files.each do |file|
+      byebug
       new_entry = new_index_entry(file)
       File.write(INDEX_FILE, new_entry, mode: 'a+') #append mode
     end
