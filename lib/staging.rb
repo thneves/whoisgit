@@ -17,9 +17,46 @@ class Staging
     new.status
   end
 
+  def recursive_search(dir, found)
+    keep_entries = ['.gitignore', '.rspec']
+    Dir.foreach(dir) do |entry|
+      next if entry == '.' || entry == '..'
+      next if entry.start_with?('.') && !keep_entries.include?(entry)
+      path = File.join(dir, entry)
+      stat = File.stat(path)
+      mode = stat.directory? ? '40000' : '100644'
+      
+      if stat.file?
+        sha = HashObject.call(path, write: true)
+      elsif stat.directory?
+        recursive_search(path, found)
+      end
+      
+      found << "#{mode} #{entry}\0 #{sha}\n"
+    end
+
+    found
+  end
+
   def add(files)
     # checking if files were in the index at first place!!
-    File.write(INDEX_FILE, '') if !File.exist?(INDEX_FILE) 
+    
+    if empty_commits?
+      entries = []
+      dir = Dir.pwd
+
+      tracked_files = recursive_search(dir, entries)
+      
+      File.write(INDEX_FILE, tracked_files.join)
+      
+      msg = tracked_files.map {|f| f.split[1] }.map {|f| f.split("\0")}
+      
+      puts "Files added to staging:\n #{msg.flatten.join(', ')}"
+    end
+    
+    byebug
+    exit 1
+    File.write(INDEX_FILE, 'oi') if !File.exist?(INDEX_FILE) 
     
     modified_files = []
     
@@ -49,14 +86,37 @@ class Staging
     end
   end
 
+  def empty_commits?
+    last_commit_ref_path = File.read(HEAD_FILE).strip.split.last # refs/heads/main
+    
+    File.exist?(last_commit_ref_path) == false
+  end
+
+  def read_head
+    File.read(HEAD_FILE).strip.split.last # refs/heads/main
+  end
+
   def status
     # compare index vs HEAD -> detect staged changes -> changes to be committed
     # compare working Dir vs index -> unstaged changes -> changes not staged to the commit
     # compare working Dir vs index -> new, untracked files -> untracked files
-  
+
+    if empty_commits?
+      branch = read_head.gsub!("refs/heads/",'')
+      puts "On branch #{branch}\n\n"
+      puts "No commits yet\n\n"
+      puts "Nothing to commit (create/copy files and use 'iamgit add' to track)"
+
+      exit 1
+    end
+
     indexed_files = File.readlines(INDEX_FILE) if index?
+
+
+
     index_list = {}
     
+
     indexed_files.each do |file_info|
       file_info.strip! #["100644", "hello.txt", "0142824230f3fafbcb268341063276ed745b142e"]
       mode     = file_info.split[0]
@@ -90,7 +150,9 @@ class Staging
 
     decompressed_tree_file = Zlib::Inflate.inflate(commit_tree_file) # "tree 312\x00100644 .rspec\x00\xC9\x9D.s\x96\xE1J\xC0r\xC6>\xC8A\x9D\x9B\x8F\xED\xE2\x8D\x8640000 ...
 
-    byebug
+    decompressed_tree_file.split.each do |item|
+      byebug
+    end
     head_tree = {
 
     }
