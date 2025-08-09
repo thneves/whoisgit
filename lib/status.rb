@@ -45,8 +45,7 @@ class Status
 
    decompressed_tree_file = Zlib::Inflate.inflate(commit_tree_file) # "tree 312\x00100644 .rspec\x00\xC9\x9D.s\x96\xE1J\xC0r\xC6>\xC8A\x9D\x9B\x8F\xED\xE2\x8D\x8640000 ...
 
-   byebug
-
+   
    head_tree = {
 
    }

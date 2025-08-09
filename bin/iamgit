@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require 'optparse'
-require 'byebug'
 require_relative '../lib/repository'
 require_relative '../lib/tree'
 require_relative '../lib/hash_object'
